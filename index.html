@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>я люблю тебя, Денис</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Bradley Hand ITC;
+            background: linear-gradient(45deg, #b5c4b2, #8d9e85, #c3d8a8, #76a072);
+            background-size: 400% 400%;
+            animation: animate-bg 10s infinite ease-in-out;
+        }
+
+        @keyframes animate-bg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .puzzle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 150px); 
+            gap: 2px;
+            width: 306px;
+            margin: 20px auto;
+            border: 2px solid #c1a5ca;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .tile {
+            width: 100px;
+            height: 150px; 
+            background-size: 300px 450px; 
+            cursor: url('heart.png'), auto;
+        }
+        .empty {
+            background: rgb(154, 173, 118);
+            cursor: url('heart.png'), auto;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: url('heart.png'), auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>я люблю тебя, Денис</h1>
+
+    <audio id="bg-music" loop>
+        <source src="background-music.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <button onclick="playMusic()">🎵 Play Music</button>
+    
+    <script>
+        function playMusic() {
+            let audio = document.getElementById("bg-music");
+            audio.play();
+        }
+    </script>
+
+    <div class="puzzle-container" id="puzzle"></div>
+    <button onclick="shuffle()">Shuffle</button>
+
+    <script>
+        const size = 3;
+        const puzzle = document.getElementById("puzzle");
+        let tiles = [];
+
+        function createPuzzle() {
+            tiles = [];
+            puzzle.innerHTML = "";
+
+            for (let i = 0; i < size * size - 1; i++) {
+                let tile = document.createElement("div");
+                tile.classList.add("tile");
+                tile.style.backgroundImage = "url('flower.png')";
+                tile.style.backgroundPosition = `${-(i % size) * 100}px ${-Math.floor(i / size) * 150}px`;
+                tile.dataset.index = i;
+                tile.addEventListener("click", moveTile);
+                tiles.push(tile);
+                puzzle.appendChild(tile);
+            }
+
+            let emptyTile = document.createElement("div");
+            emptyTile.classList.add("tile", "empty");
+            tiles.push(emptyTile);
+            puzzle.appendChild(emptyTile);
+        }
+
+        function moveTile() {
+            let emptyIndex = tiles.findIndex(tile => tile.classList.contains("empty"));
+            let tileIndex = tiles.indexOf(this);
+
+            if ([emptyIndex - 1, emptyIndex + 1, emptyIndex - size, emptyIndex + size].includes(tileIndex)) {
+                [tiles[tileIndex], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[tileIndex]];
+                updatePuzzle();
+            }
+        }
+
+        function updatePuzzle() {
+            puzzle.innerHTML = "";
+            tiles.forEach(tile => puzzle.appendChild(tile));
+        }
+
+        function shuffle() {
+            for (let i = 0; i < 100; i++) {
+                let movableTiles = tiles.filter((tile, index) => 
+                    [tiles.findIndex(t => t.classList.contains("empty")) - 1, 
+                     tiles.findIndex(t => t.classList.contains("empty")) + 1, 
+                     tiles.findIndex(t => t.classList.contains("empty")) - size, 
+                     tiles.findIndex(t => t.classList.contains("empty")) + size].includes(index)
+                );
+                let randomTile = movableTiles[Math.floor(Math.random() * movableTiles.length)];
+                randomTile.click();
+            }
+        }
+
+        createPuzzle();
+    </script>
+</body>
+</html>
